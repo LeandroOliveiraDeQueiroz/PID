@@ -2,8 +2,8 @@ import cv2
 
 # fotos = ["teste1.jpeg", "teste2.jpeg", "teste3.jpeg", "teste4.jpeg", "teste5.jpeg"]
 
-prova_em_branco = "prova/teste.png"
-prova_marcada = "prova/teste_marcado.png"
+provaGabarito = "prova/originais/gabarito.png"
+provaAluno = "prova/originais/aluno.png"
 
 # for i,photo in enumerate(fotos):
 #     im_gray = cv2.imread(photo, cv2.IMREAD_GRAYSCALE)
@@ -14,22 +14,55 @@ prova_marcada = "prova/teste_marcado.png"
     # cv2.imwrite( "teste" + str(i+1) + "_gray.jpeg", im_gray)
 
 
-prova_em_branco_G = cv2.imread(prova_em_branco, cv2.IMREAD_GRAYSCALE)
-prova_marcada_G = cv2.imread(prova_marcada, cv2.IMREAD_GRAYSCALE)
+provaGabaritoGreyScale = cv2.imread(provaGabarito, cv2.IMREAD_GRAYSCALE)
+provaAlunoGreyScale = cv2.imread(provaAluno, cv2.IMREAD_GRAYSCALE)
 
 
-prova_em_branco_L = cv2.adaptiveThreshold(prova_em_branco_G, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
-prova_marcada_L = cv2.adaptiveThreshold(prova_marcada_G, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
+provaGabaritoThreshold = cv2.adaptiveThreshold(provaGabaritoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
+provaAlunoThreshold = cv2.adaptiveThreshold(provaAlunoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
 
-cv2.imwrite("prova/prova_em_branco_L.jpeg",prova_em_branco_L)
-cv2.imwrite("prova/prova_marcada_L.jpeg",prova_marcada_L)
+cv2.imwrite("prova/limiarizados/gabarito.jpeg", provaGabaritoThreshold)
+cv2.imwrite("prova/limiarizados/aluno.jpeg", provaAlunoThreshold)
 
-subtract = cv2.subtract(prova_em_branco_L, prova_marcada_L)
-cv2.imwrite("prova/subtract.jpeg", subtract)
+subtract = provaGabaritoThreshold - provaAlunoThreshold
+# cv2.subtract(provaGabaritoThreshold, prova_marcada_L)
+cv2.imwrite("prova/resultados/subtract.jpeg", subtract)
+# cv2.imshow("Output", subtract)
+# cv2.waitKey(0)
 
-# cv2.imshow('prova_em_branco',prova_em_branco_M)
-# cv2.imshow('prova_marcada',prova_marcada_M)
-# cv2.imshow('original_81x60',subtract)
+average = cv2.blur(subtract,(9,9))
+# cv2.imshow("Average Filter", subtract)
+# cv2.waitKey(0)
+cv2.imwrite("prova/resultados/average.jpeg", average)
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+ret, result = cv2.threshold(average,127,255,cv2.THRESH_BINARY)
+cv2.imwrite("prova/resultados/result.jpeg", result)
+# cv2.imshow("Result", result)
+# cv2.waitKey(0)
+
+#reading the image 
+edged = cv2.Canny(result, 10, 250)
+# cv2.imshow("Edges", edged)
+# cv2.waitKey(0)
+ 
+#applying closing function 
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
+# cv2.imshow("Closed", closed)
+# cv2.waitKey(0)
+ 
+#finding_contours 
+(cnts, _) = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+print(len(cnts)) 
+
+# for c in cnts:
+# 	peri = cv2.arcLength(c, True)
+# 	approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+# 	cv2.drawContours(subtract, [approx], -1, (0, 255, 0), 2)
+# cv2.imshow("Output", subtract)
+# cv2.waitKey(0)
+
+
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
