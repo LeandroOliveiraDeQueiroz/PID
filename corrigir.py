@@ -2,8 +2,8 @@ import cv2
 
 # fotos = ["teste1.jpeg", "teste2.jpeg", "teste3.jpeg", "teste4.jpeg", "teste5.jpeg"]
 
-provaGabarito = "prova/originais/gabarito.png"
-provaAluno = "prova/originais/aluno.png"
+provaGabarito = "prova/originais/provaImpressa/gabarito.jpeg"
+provaAluno = "prova/originais/provaImpressa/aluno.jpeg"
 
 # for i,photo in enumerate(fotos):
 #     im_gray = cv2.imread(photo, cv2.IMREAD_GRAYSCALE)
@@ -14,17 +14,18 @@ provaAluno = "prova/originais/aluno.png"
     # cv2.imwrite( "teste" + str(i+1) + "_gray.jpeg", im_gray)
 
 
-provaGabaritoGreyScale = cv2.imread(provaGabarito, cv2.IMREAD_GRAYSCALE)
-provaAlunoGreyScale = cv2.imread(provaAluno, cv2.IMREAD_GRAYSCALE)
+# provaGabaritoGreyScale = cv2.imread(provaGabarito, cv2.IMREAD_GRAYSCALE)
+# provaAlunoGreyScale = cv2.imread(provaAluno, cv2.IMREAD_GRAYSCALE)
 
+provaGabaritoGreyScale = cv2.imread(provaGabarito)
+provaAlunoGreyScale = cv2.imread(provaAluno)
+# provaGabaritoThreshold = cv2.adaptiveThreshold(provaGabaritoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
+# provaAlunoThreshold = cv2.adaptiveThreshold(provaAlunoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
 
-provaGabaritoThreshold = cv2.adaptiveThreshold(provaGabaritoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
-provaAlunoThreshold = cv2.adaptiveThreshold(provaAlunoGreyScale, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 81, 20) # melhor
+# cv2.imwrite("prova/limiarizados/gabarito.jpeg", provaGabaritoThreshold)
+# cv2.imwrite("prova/limiarizados/aluno.jpeg", provaAlunoThreshold)
 
-cv2.imwrite("prova/limiarizados/gabarito.jpeg", provaGabaritoThreshold)
-cv2.imwrite("prova/limiarizados/aluno.jpeg", provaAlunoThreshold)
-
-subtract = provaGabaritoThreshold - provaAlunoThreshold
+subtract = provaGabaritoGreyScale - provaAlunoGreyScale
 # cv2.subtract(provaGabaritoThreshold, prova_marcada_L)
 cv2.imwrite("prova/resultados/subtract.jpeg", subtract)
 # cv2.imshow("Output", subtract)
